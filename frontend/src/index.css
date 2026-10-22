@@ -1,0 +1,170 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens. Components only use these semantic names. The dark theme is
+ * its own set of values, chosen for the dark surfaces, not an inversion.
+ * The theme follows the system unless <html data-theme> pins it.
+ */
+:root {
+  color-scheme: light;
+  --canvas: #f4f6fa;
+  --surface: #ffffff;
+  --surface-muted: #f7f9fc;
+  --ink: #0e1726;
+  --ink-muted: #5b6578;
+  --ink-subtle: #8a93a5;
+  --line: #e3e7ee;
+  --line-strong: #cfd5df;
+  --brand: #2f5bea;
+  --brand-hover: #2449c7;
+  --brand-soft: #eaf0ff;
+  --brand-ink: #ffffff;
+  --hero: #0f1b3d;
+  --hero-ink: #ffffff;
+  --hero-muted: #aab6d3;
+  --hero-line: #24335c;
+  --hero-accent: #8fb0ff;
+  --credit: #2a78d6;
+  --credit-text: #1c5cab;
+  --credit-soft: #e8f1fc;
+  --debit: #e34948;
+  --debit-text: #b42625;
+  --debit-soft: #fdecec;
+  --topup-text: #4a3aa7;
+  --topup-soft: #efedfc;
+  --danger: #c22f2e;
+  --danger-soft: #fdecec;
+  --success: #12733f;
+  --success-soft: #e5f5ec;
+  --focus: #2f5bea;
+  --shadow: 0 1px 2px rgb(14 23 38 / 0.04), 0 1px 3px rgb(14 23 38 / 0.06);
+  --shadow-lg: 0 12px 32px rgb(14 23 38 / 0.14);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --canvas: #0b1120;
+    --surface: #111a2e;
+    --surface-muted: #0e1628;
+    --ink: #e6ebf5;
+    --ink-muted: #9aa6bd;
+    --ink-subtle: #6b7790;
+    --line: #1f2a40;
+    --line-strong: #2b3852;
+    --brand: #4767f0;
+    --brand-hover: #5f7cf5;
+    --brand-soft: #18234a;
+    --brand-ink: #ffffff;
+    --hero: #18285a;
+    --hero-ink: #ffffff;
+    --hero-muted: #aab6d3;
+    --hero-line: #2c3e74;
+    --hero-accent: #9db8ff;
+    --credit: #3987e5;
+    --credit-text: #86b6ef;
+    --credit-soft: #13243f;
+    --debit: #e66767;
+    --debit-text: #f19a9a;
+    --debit-soft: #3a1a1e;
+    --topup-text: #b9b1f3;
+    --topup-soft: #221f45;
+    --danger: #f08080;
+    --danger-soft: #3a1a1e;
+    --success: #6fd39b;
+    --success-soft: #12301f;
+    --focus: #86a0ff;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+    --shadow-lg: 0 16px 40px rgb(0 0 0 / 0.5);
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --canvas: #0b1120;
+  --surface: #111a2e;
+  --surface-muted: #0e1628;
+  --ink: #e6ebf5;
+  --ink-muted: #9aa6bd;
+  --ink-subtle: #6b7790;
+  --line: #1f2a40;
+  --line-strong: #2b3852;
+  --brand: #4767f0;
+  --brand-hover: #5f7cf5;
+  --brand-soft: #18234a;
+  --brand-ink: #ffffff;
+  --hero: #18285a;
+  --hero-ink: #ffffff;
+  --hero-muted: #aab6d3;
+  --hero-line: #2c3e74;
+  --hero-accent: #9db8ff;
+  --credit: #3987e5;
+  --credit-text: #86b6ef;
+  --credit-soft: #13243f;
+  --debit: #e66767;
+  --debit-text: #f19a9a;
+  --debit-soft: #3a1a1e;
+  --topup-text: #b9b1f3;
+  --topup-soft: #221f45;
+  --danger: #f08080;
+  --danger-soft: #3a1a1e;
+  --success: #6fd39b;
+  --success-soft: #12301f;
+  --focus: #86a0ff;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 16px 40px rgb(0 0 0 / 0.5);
+}
+
+@theme inline {
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-subtle: var(--ink-subtle);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-ink: var(--brand-ink);
+  --color-hero: var(--hero);
+  --color-hero-ink: var(--hero-ink);
+  --color-hero-muted: var(--hero-muted);
+  --color-hero-line: var(--hero-line);
+  --color-hero-accent: var(--hero-accent);
+  --color-credit: var(--credit);
+  --color-credit-text: var(--credit-text);
+  --color-credit-soft: var(--credit-soft);
+  --color-debit: var(--debit);
+  --color-debit-text: var(--debit-text);
+  --color-debit-soft: var(--debit-soft);
+  --color-topup-text: var(--topup-text);
+  --color-topup-soft: var(--topup-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-focus: var(--focus);
+  --shadow-card: var(--shadow);
+  --shadow-overlay: var(--shadow-lg);
+}
+
+@layer base {
+  body {
+    @apply bg-canvas text-ink font-sans text-sm antialiased;
+  }
+
+  :focus-visible {
+    @apply outline-focus outline-2 outline-offset-2;
+  }
+
+  ::backdrop {
+    background: rgb(8 12 24 / 0.5);
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
