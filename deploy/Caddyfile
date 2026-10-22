@@ -1,6 +1,12 @@
-# SITE_ADDRESS is a domain (HTTPS certificate is issued automatically) or :80.
+# SITE_ADDRESS is the domain pointing at the server: Caddy obtains and renews
+# its Let's Encrypt certificate automatically. Use :80 for plain HTTP.
 {$SITE_ADDRESS::80} {
 	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		-Server
+	}
 
 	# /api/login -> api:3000/login
 	handle_path /api/* {
