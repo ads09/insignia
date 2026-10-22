@@ -42,17 +42,76 @@ Seeded logins: `admin` / `admin12345` (administrator), and `alice` … `laura` /
 | Backend details, tests, architecture | [backend/README.md](backend/README.md) |
 | Frontend pages, tests, architecture | [frontend/README.md](frontend/README.md) |
 
-## Production (Docker)
+## Deployment
 
-`deploy/` runs the whole application with one command: Postgres, the API (which
-applies migrations and the seed on start) and Caddy, which serves the dashboard,
-proxies `/api` to the API and obtains an HTTPS certificate for `SITE_ADDRESS`.
+`deploy/` runs the whole application on one server with Docker Compose:
+
+| Service | |
+|---|---|
+| `db` | PostgreSQL 17, reachable only inside the Docker network |
+| `api` | The backend. Applies the migrations and the (idempotent) seed on every start |
+| `web` | Caddy serving the dashboard, proxying `/api/*` to the API (prefix removed) and `/docs` to Swagger UI, with an automatic Let's Encrypt certificate |
+
+The dashboard calls the API at the relative path `/api`, so the images are not
+tied to a domain.
+
+### Server requirements
+
+- Linux with Docker and the Compose plugin (`curl -fsSL https://get.docker.com | sh`).
+- Ports 80 and 443 open (443/udp too for HTTP/3).
+- A domain whose A record points at the server.
+- On 1 GB RAM machines (e.g. AWS `t3.micro`), add swap before building:
+
+  ```bash
+  sudo fallocate -l 2G /swapfile && sudo chmod 600 /swapfile
+  sudo mkswap /swapfile && sudo swapon /swapfile
+  echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+  ```
+
+### First deployment
 
 ```bash
-cd deploy
-cp .env.example .env   # set SITE_ADDRESS, POSTGRES_PASSWORD, JWT_SECRET, ADMIN_PASSWORD
-docker compose up -d --build
+git clone <repository-url> insignia
+cd insignia/deploy
+cp .env.example .env
 ```
+
+Fill in `deploy/.env`:
+
+| Variable | Value |
+|---|---|
+| `SITE_ADDRESS` | The domain, e.g. `wallet.example.com`. `:80` serves plain HTTP without a certificate |
+| `POSTGRES_PASSWORD` | `openssl rand -hex 32` (hex only, it is used inside a URL) |
+| `JWT_SECRET` | `openssl rand -hex 32` |
+| `ADMIN_USERNAME` / `ADMIN_PASSWORD` | Administrator account created by the seed |
+
+```bash
+docker compose up -d --build
+docker compose logs -f api   # wait for "Nest application successfully started"
+```
+
+Open `https://<SITE_ADDRESS>`. The seeded demo users (`alice` … `laura` /
+`password123`) are available as in development.
+
+### Updating
+
+```bash
+git pull
+cd deploy && docker compose up -d --build
+```
+
+Data lives in the `db-data` volume and survives rebuilds. New migrations are
+applied when the API starts.
+
+### Operations
+
+| Task | Command (in `deploy/`) |
+|---|---|
+| Status | `docker compose ps` |
+| Logs | `docker compose logs -f api` (or `web`, `db`) |
+| Restart the API | `docker compose restart api` |
+| Stop, keeping data | `docker compose down` |
+| Stop and delete all data | `docker compose down -v` |
 
 ## API
 
