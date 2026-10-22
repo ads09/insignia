@@ -1,0 +1,6 @@
+# Local notes: ignore all markdown except README.md
+*.md
+!README.md
+
+# Assignment brief
+Tech Test_FS_OKTOBER 2024 .pdf

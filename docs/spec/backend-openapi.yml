@@ -1,0 +1,250 @@
+openapi: 3.1.0
+info:
+  title: Insignia - Offline assignment
+  version: '1.0'
+  summary: Offline assignment
+  description: |-
+    # Insignia - Offline assignment
+
+    The goal is to build backend for simple Crypto wallet application, The functionality is to be exposed as REST APIs as per the documentation provided.
+
+    The wallet backend must be implemented with NodeJs and the complete source code must contain a detailed README with instructions on building and running the services and also the source code should be pushed to any GIT remote repository
+
+    Please use Git for version control so we can look at your commit logs and understand how your solution evolved. Frequent commits are a huge plus.
+
+    Following are the main functionalities expected from the services
+
+    1. Register new users
+    2. Read balance
+    3. Deposit balance
+    4. Transfer between wallets
+    5. List Top N of transactions by value per user
+    6. List overall top transacting users by value
+
+    You can use any appropriate REST Framework/library for the implementation, each data must be stored on Postgres SQL database
+
+    Following are the evaluation criteria:
+    1. Code Readability and solution design
+    2. Correctness
+    3. Write unit test on some of important files, bigger plus point for completing unit test case
+    4. Good use of asynchronousy
+
+    Plus points:
+
+    1. Complete all test case
+    2. Deploying results to live url so we can see the result
+    3. Implementation of clean architecuture and clean code is a **BIG** plus
+servers: []
+paths:
+  /user:
+    parameters: []
+    post:
+      summary: Register user
+      operationId: post-create_user
+      responses:
+        '201':
+          description: User's details including authentication token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+              examples:
+                example-1:
+                  token: '123456789'
+        '400':
+          description: Bad Request
+        '409':
+          description: Username already exists
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+            examples:
+              example:
+                username: abcd
+        description: Username
+      description: Register a new user by username. Username is to be unique for every user.
+  /topup:
+    post:
+      summary: Balance topup
+      operationId: post-balance-topup
+      responses:
+        '204':
+          description: Topup successful
+        '400':
+          description: Invalid topup amount
+        '401':
+          description: User token not valid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+            examples:
+              example-1:
+                amount: 1000
+        description: ''
+      description: Topup  the crypto wallet balance of current user based on token. Only positive topup amounts and values < 10000000 are to be allowed.
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: Authorization
+          description: User token
+    parameters: []
+  /balance:
+    get:
+      summary: Balance read
+      tags: []
+      responses:
+        '200':
+          description: Balance read success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  balance:
+                    type: number
+              examples:
+                example-1:
+                  balance: 0
+                example-2:
+                  balance: 1000
+        '401':
+          description: Unauthorized user
+      operationId: get-balance_read
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: Authorization
+          description: User token
+      description: Fetch the current balance based on user token
+    parameters: []
+  /transfer:
+    post:
+      summary: Transfer
+      operationId: post-transfer
+      responses:
+        '204':
+          description: Transfer success
+        '400':
+          description: Insufficient balance
+        '401':
+          description: Unauthorized
+        '404':
+          description: Destination user not found
+      description: |-
+        Transfer balance from one user to another. Wallet balance to be always >= 0.
+
+        The balance should be deducted from the user whose account the transfer is being initiated and added to the user identified by "to_username" in the request body.
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: Authorization
+          description: User token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                to_username:
+                  type: string
+                amount:
+                  type: number
+            examples:
+              example-1:
+                to_username: username
+                amount: 100
+  /top_transactions_per_user:
+    get:
+      summary: Top transactions for user
+      tags: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    username:
+                      type: string
+                    amount:
+                      type: number
+              examples:
+                example-1:
+                  - username: user123
+                    amount: 100
+                  - username: user456
+                    amount: -80
+                example-2: []
+        '401':
+          description: Unauthorized
+      operationId: get-top_transactions_per_user
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: Authorization
+          description: User token
+      description: |-
+        Return the top 10 transactions by value for the user. The response should include both credits (transfers to the user) and debits (transfers from the user). Transaction value should be considered irrespective of the direction of transfer (credit and debit). 
+
+        Response to be sorted on the absolute value of the transactions in descending order. Debit transactions to be returned as negative values.
+
+        In case of user with no transactions, a successful response with an empty list of transactions is to be returned.
+  /top_users:
+    get:
+      summary: List overall top transacting users by value
+      tags: []
+      responses:
+        '200':
+          description: Top users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    username:
+                      type: string
+                    transacted_value:
+                      type: number
+                      description: Total aggregated value of all the debit transactions for the user.
+              examples:
+                example-1:
+                  - username: user1234
+                    transacted_value: 10000
+                  - username: user4567
+                    transacted_value: 8000
+                  - username: user890
+                    transacted_value: 0
+        '401':
+          description: Unauthorized
+      operationId: get-top_users
+      description: Return the list of top 10 users by value of transfers. The transfer value should consider only outbound transfers done by a particular user (debits). The transfer value per user should be the total aggregated value.
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: Authorization
+          description: User token
+components:
+  schemas: {}
