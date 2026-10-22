@@ -6,7 +6,7 @@ React.js admin dashboard that consumes it.
 ```
 .
 ├── backend/    NestJS + Prisma + PostgreSQL REST API
-├── frontend/   React.js admin dashboard
+├── frontend/   React (Vite) admin dashboard
 └── docs/spec/  original OpenAPI specification of the assignment
 ```
 
@@ -25,6 +25,12 @@ npm install
 npm run db:migrate
 npm run db:seed
 npm run start:dev
+
+# Frontend, in another terminal from the repository root: http://localhost:5173
+cd frontend
+cp .env.example .env
+npm install
+npm run dev
 ```
 
 Seeded logins: `admin` / `admin12345` (administrator), and `alice` … `laura` /
@@ -33,6 +39,7 @@ Seeded logins: `admin` / `admin12345` (administrator), and `alice` … `laura` /
 | | |
 |---|---|
 | Backend details, tests, architecture | [backend/README.md](backend/README.md) |
+| Frontend pages, tests, architecture | [frontend/README.md](frontend/README.md) |
 
 ## API
 
