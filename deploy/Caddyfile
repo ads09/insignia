@@ -1,0 +1,22 @@
+# SITE_ADDRESS is a domain (HTTPS certificate is issued automatically) or :80.
+{$SITE_ADDRESS::80} {
+	encode zstd gzip
+
+	# /api/login -> api:3000/login
+	handle_path /api/* {
+		reverse_proxy api:3000
+	}
+
+	handle /docs* {
+		reverse_proxy api:3000
+	}
+
+	handle {
+		root * /srv
+		@assets path /assets/*
+		header @assets Cache-Control "public, max-age=31536000, immutable"
+		# Client-side routes such as /transactions are served index.html.
+		try_files {path} /index.html
+		file_server
+	}
+}

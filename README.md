@@ -7,6 +7,7 @@ React.js admin dashboard that consumes it.
 .
 ├── backend/    NestJS + Prisma + PostgreSQL REST API
 ├── frontend/   React (Vite) admin dashboard
+├── deploy/     production Docker Compose stack (Postgres, API, Caddy)
 └── docs/spec/  original OpenAPI specification of the assignment
 ```
 
@@ -40,6 +41,18 @@ Seeded logins: `admin` / `admin12345` (administrator), and `alice` … `laura` /
 |---|---|
 | Backend details, tests, architecture | [backend/README.md](backend/README.md) |
 | Frontend pages, tests, architecture | [frontend/README.md](frontend/README.md) |
+
+## Production (Docker)
+
+`deploy/` runs the whole application with one command: Postgres, the API (which
+applies migrations and the seed on start) and Caddy, which serves the dashboard,
+proxies `/api` to the API and obtains an HTTPS certificate for `SITE_ADDRESS`.
+
+```bash
+cd deploy
+cp .env.example .env   # set SITE_ADDRESS, POSTGRES_PASSWORD, JWT_SECRET, ADMIN_PASSWORD
+docker compose up -d --build
+```
 
 ## API
 
