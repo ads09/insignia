@@ -12,7 +12,27 @@ React.js admin dashboard that consumes it.
 
 ## Getting started
 
-> Setup, run and test instructions will be completed as the project is scaffolded.
+Requirements: Node.js 22+ (npm 11) and Docker.
+
+```bash
+# PostgreSQL (databases `insignia` and `insignia_test`)
+docker compose up -d
+
+# Backend: http://localhost:3000, Swagger UI at http://localhost:3000/docs
+cd backend
+cp .env.example .env
+npm install
+npm run db:migrate
+npm run db:seed
+npm run start:dev
+```
+
+Seeded logins: `admin` / `admin12345` (administrator), and `alice` … `laura` /
+`password123` (users).
+
+| | |
+|---|---|
+| Backend details, tests, architecture | [backend/README.md](backend/README.md) |
 
 ## API
 
