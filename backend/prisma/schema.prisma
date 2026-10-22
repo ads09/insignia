@@ -1,0 +1,54 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum TransactionType {
+  TOPUP
+  TRANSFER
+}
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  username     String   @unique
+  /// Optional: the assignment specification registers users by username only.
+  passwordHash String?  @map("password_hash")
+  role         Role     @default(USER)
+  balance      Decimal  @default(0) @db.Decimal(20, 8)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  sentTransactions     Transaction[] @relation("sender")
+  receivedTransactions Transaction[] @relation("receiver")
+
+  @@map("users")
+}
+
+model Transaction {
+  id         String          @id @default(uuid()) @db.Uuid
+  type       TransactionType
+  /// Null for top-ups.
+  senderId   String?         @map("sender_id") @db.Uuid
+  receiverId String          @map("receiver_id") @db.Uuid
+  /// Always positive; the direction is derived from sender/receiver.
+  amount     Decimal         @db.Decimal(20, 8)
+  createdAt  DateTime        @default(now()) @map("created_at")
+
+  sender   User? @relation("sender", fields: [senderId], references: [id], onDelete: Restrict)
+  receiver User  @relation("receiver", fields: [receiverId], references: [id])
+
+  @@index([senderId, amount])
+  @@index([receiverId, amount])
+  @@index([createdAt])
+  @@map("transactions")
+}
